@@ -15,16 +15,38 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
-from django.urls import path
-from django.contrib import admin
 from django.urls import path, include
+from rest_framework import permissions
+from django.urls import re_path
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from django.contrib import admin
 from rest_framework_simplejwt import views as jwt_views
+from rest_framework_simplejwt.views import token_obtain_pair, token_refresh
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
 
 urlpatterns = [
+    # path("token", token_obtain_pair, name="get token"),
+    # path("token/refresh", token_refresh, name="refresh token"),
+
     path("admin/", admin.site.urls),
-    path("token/", jwt_views.TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/", token_obtain_pair, name="get token"),
+    path("token/refresh/", token_refresh, name="refresh token"),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('', include('authentification.urls')),
- 
+    
 ]
